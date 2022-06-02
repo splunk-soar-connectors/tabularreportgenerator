@@ -1,0 +1,168 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+from __future__ import print_function, unicode_literals
+
+# Phantom App imports
+import phantom.app as phantom
+from phantom.base_connector import BaseConnector
+from phantom.action_result import ActionResult
+
+# Usage of the consts file is recommended
+import json
+import requests
+from pydantic import ValidationError
+
+from tabularreportgenerator_types import Report
+from tabularreportgenerator_consts import REPORT_TEMPLATE
+from tabularreportgenerator_html import make_html, load_template
+from tabularreportgenerator_email import make_email
+from tabularreportgenerator_soar import get_custom_list
+
+
+class TabularReportGeneratorConnector(BaseConnector):
+
+    def __init__(self):
+        super(TabularReportGeneratorConnector, self).__init__()
+        self._state = None
+
+    def initialize(self):
+        self._state = self.load_state()
+        config = self.get_config()
+        self._image_list = config.get("image_list")
+
+        return phantom.APP_SUCCESS
+
+    def finalize(self):
+        self.save_state(self._state)
+        return phantom.APP_SUCCESS
+
+    def _handle_test_connectivity(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if self._image_list:
+            self.save_progress("Check if image lists exists")
+            try:
+                get_custom_list(self, self._image_list)
+            except Exception as err:
+                self.save_progress("Test Connectivity Failed")
+                return action_result.set_status(phantom.APP_ERROR, f"Could not find custom list: {err}")
+
+        self.save_progress("Test Connectivity Passed")
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _handle_generate_report_email(self, param):
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        from_email = param["from"]
+        to_email = param["to"]
+        subject = param["subject"]
+
+        try:
+            report_json = json.loads(param['report_json'])
+        except ValueError as err:
+            return action_result.set_status(phantom.APP_ERROR, f"Please provide valid JSON as report_json: {err}")
+
+        try:
+            report = Report(**report_json)
+        except ValidationError as err:
+            return action_result.set_status(phantom.APP_ERROR, f"Please provide a valid report specification as report_json: {err}")
+
+        report_template = load_template(REPORT_TEMPLATE)
+        report_html = make_html(report, report_template)
+
+        try:
+            report_rawmail = make_email(self, report, report_html, from_email, to_email, subject, self._image_list)
+        except Exception as err:
+            return action_result.set_status(phantom.APP_ERROR, f"Email generation failed: {err}")
+
+        action_result.add_data(report_rawmail)
+
+        # summary = action_result.update_summary({})
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def handle_action(self, param):
+        ret_val = phantom.APP_SUCCESS
+
+        action_id = self.get_action_identifier()
+        self.debug_print("action_id", self.get_action_identifier())
+
+        if action_id == 'test_connectivity':
+            ret_val = self._handle_test_connectivity(param)
+
+        elif action_id == 'generate_report_email':
+            ret_val = self._handle_generate_report_email(param)
+
+        return ret_val
+
+
+def main():
+    import pudb
+    import argparse
+
+    pudb.set_trace()
+
+    argparser = argparse.ArgumentParser()
+
+    argparser.add_argument('input_test_json', help='Input Test JSON file')
+    argparser.add_argument('-u', '--username', help='username', required=False)
+    argparser.add_argument('-p', '--password', help='password', required=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+
+    if username is not None and password is None:
+
+        # User specified a username but not a password, so ask
+        import getpass
+        password = getpass.getpass("Password: ")
+
+    if username and password:
+        try:
+            login_url = TabularReportGeneratorConnector._get_phantom_base_url() + '/login'
+
+            print("Accessing the Login page")
+            r = requests.get(login_url, verify=False)
+            csrftoken = r.cookies['csrftoken']
+
+            data = dict()
+            data['username'] = username
+            data['password'] = password
+            data['csrfmiddlewaretoken'] = csrftoken
+
+            headers = dict()
+            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Referer'] = login_url
+
+            print("Logging into Platform to get the session id")
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            session_id = r2.cookies['sessionid']
+        except Exception as e:
+            print("Unable to get session id from the platform. Error: " + str(e))
+            exit(1)
+
+    with open(args.input_test_json) as f:
+        in_json = f.read()
+        in_json = json.loads(in_json)
+        print(json.dumps(in_json, indent=4))
+
+        connector = TabularReportGeneratorConnector()
+        connector.print_progress_message = True
+
+        if session_id is not None:
+            in_json['user_session_token'] = session_id
+            connector._set_csrf_info(csrftoken, headers['Referer'])
+
+        ret_val = connector._handle_action(json.dumps(in_json), None)
+        print(json.dumps(json.loads(ret_val), indent=4))
+
+    exit(0)
+
+
+if __name__ == '__main__':
+    main()
