@@ -5,6 +5,7 @@ from __future__ import print_function, unicode_literals
 
 # Usage of the consts file is recommended
 import json
+from pathlib import Path
 
 # Phantom App imports
 import phantom.app as phantom
@@ -13,7 +14,7 @@ from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 from pydantic import ValidationError
 
-from tabularreportgenerator_consts import DEFAULT_TIMEOUT, REPORT_TEMPLATE
+from tabularreportgenerator_consts import DEFAULT_TIMEOUT
 from tabularreportgenerator_email import make_email
 from tabularreportgenerator_html import load_template, make_html
 from tabularreportgenerator_soar import get_custom_list
@@ -69,7 +70,9 @@ class TabularReportGeneratorConnector(BaseConnector):
         except ValidationError as err:
             return action_result.set_status(phantom.APP_ERROR, f"Please provide a valid report specification as report_json: {err}")
 
-        report_template = load_template(REPORT_TEMPLATE)
+        templates_dir = Path(__file__).parent.resolve() / "templates"
+        report_template = templates_dir / Path("report.j2")
+        report_template = load_template(report_template)
         report_html = make_html(report, report_template)
 
         try:
