@@ -13,7 +13,7 @@ from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 from pydantic import ValidationError
 
-from tabularreportgenerator_consts import REPORT_TEMPLATE
+from tabularreportgenerator_consts import DEFAULT_TIMEOUT, REPORT_TEMPLATE
 from tabularreportgenerator_email import make_email
 from tabularreportgenerator_html import load_template, make_html
 from tabularreportgenerator_soar import get_custom_list
@@ -75,7 +75,9 @@ class TabularReportGeneratorConnector(BaseConnector):
         try:
             report_rawmail = make_email(self, report, report_html, from_email, to_email, subject, self._image_list)
         except Exception as err:
-            return action_result.set_status(phantom.APP_ERROR, f"Email generation failed: {err}")
+            msg = f"Email generation failed: {err}"
+            self.error_print(msg)
+            return action_result.set_status(phantom.APP_ERROR, msg)
 
         action_result.add_data(report_rawmail)
 
@@ -100,6 +102,7 @@ class TabularReportGeneratorConnector(BaseConnector):
 
 def main():
     import argparse
+    import sys
 
     import pudb
 
@@ -128,7 +131,7 @@ def main():
             login_url = TabularReportGeneratorConnector._get_phantom_base_url() + '/login'
 
             print("Accessing the Login page")
-            r = requests.get(login_url, verify=False)
+            r = requests.get(login_url, timeout=DEFAULT_TIMEOUT)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -141,11 +144,11 @@ def main():
             headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, data=data, headers=headers, timeout=DEFAULT_TIMEOUT)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platform. Error: " + str(e))
-            exit(1)
+            sys.exit(1)
 
     with open(args.input_test_json) as f:
         in_json = f.read()
@@ -162,7 +165,7 @@ def main():
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
-    exit(0)
+    sys.exit(0)
 
 
 if __name__ == '__main__':
