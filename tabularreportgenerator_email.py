@@ -1,8 +1,8 @@
 import csv
 import io
+from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
-from email.mime.base import MIMEBase
 
 from tabularreportgenerator_soar import get_custom_list
 

@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from jinja2 import Template, Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, Template
+
 from tabularreportgenerator_types import Report
 
 

@@ -3,21 +3,21 @@
 
 from __future__ import print_function, unicode_literals
 
-# Phantom App imports
-import phantom.app as phantom
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-
 # Usage of the consts file is recommended
 import json
+
+# Phantom App imports
+import phantom.app as phantom
 import requests
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
 from pydantic import ValidationError
 
-from tabularreportgenerator_types import Report
 from tabularreportgenerator_consts import REPORT_TEMPLATE
-from tabularreportgenerator_html import make_html, load_template
 from tabularreportgenerator_email import make_email
+from tabularreportgenerator_html import load_template, make_html
 from tabularreportgenerator_soar import get_custom_list
+from tabularreportgenerator_types import Report
 
 
 class TabularReportGeneratorConnector(BaseConnector):
@@ -99,8 +99,9 @@ class TabularReportGeneratorConnector(BaseConnector):
 
 
 def main():
-    import pudb
     import argparse
+
+    import pudb
 
     pudb.set_trace()
 

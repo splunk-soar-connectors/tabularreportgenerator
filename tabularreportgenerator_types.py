@@ -1,7 +1,8 @@
 import abc
-from pydantic import BaseModel, Field
 # from typing_extensions import Protocol
 from typing import List, Union
+
+from pydantic import BaseModel, Field
 
 
 class Row(BaseModel, abc.ABC):
