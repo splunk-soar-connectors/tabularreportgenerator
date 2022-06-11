@@ -1,87 +1,66 @@
-# Splunk> Phantom
+[comment]: # "Auto-generated SOAR connector documentation"
+# Tabular Report Generator
 
-Welcome to the open-source repository for Splunk> Phantom's tabularreportgenerator App.
+Publisher: Splunk Community  
+Connector Version: 1\.0\.1  
+Product Vendor: Splunk Community  
+Product Name: SOAR  
+Product Version Supported (regex): "\.\*"  
+Minimum Product Version: 5\.2\.0  
 
-Please have a look at our [Contributing Guide](https://github.com/Splunk-SOAR-Apps/.github/blob/main/.github/CONTRIBUTING.md) if you are interested in contributing, raising issues, or learning more about open-source Phantom apps.
-
-## Legal and License
-
-This Phantom App is licensed under the Apache 2.0 license. Please see our [Contributing Guide](https://github.com/Splunk-SOAR-Apps/.github/blob/main/.github/CONTRIBUTING.md#legal-notice) for further details.
-
-# Tabular Report Generator 
-
-The Tabular Report Generator (TRG) is a utility app for Splunk SOAR to generate tabular reports within playbooks to be delivered via the SMTP app.
-
-## Installation
-
-Please refer to the official Splunk SOAR documentation on how to install the app bundle on your platform.
-
-## Provided Actions
-
-- generate report email
-
-## Configuration
-
-If your report requires embedded images (eg. a banner or logo), create a new custom list and configure it under the TRG asset settings. If you don't need images inside your report, feel free to skip this.
-
-The custom list must have two columns where the first one denotes the `cid` of the image (content id, must be unique in the list) and the second column must contain the image encoded in base64 format. It is recommended to use an external tool such as Excel to generate a CSV file following this format and to populate the custom list using the CSV upload functionality. 
-
-## Report Specification
-
-The **generate report email** action takes a `report_json` parameter as input which is defining the reports overall structure. The required input is a JSON with the following format eg:
-
-```
-{
-    "message": "Intro Message",
-    "rows": [{
-        "type": "heading_row",
-        "value": "My heading"
-    }]
-}
-```
-
-It is recommended to use an inline Code block inside your SOAR playbook to generate this input and not a Format block which requires cumbersome escaping when handling nested JSON.
-
-### Row Types
-
-Rows are entered in the `rows` key of the report specification. There are currently a number of row types supported. Every entry in the `rows` list corresponds to a row in the resulting report:
-
-- `heading_row`: Visually highlighted row with centered text
-    - **value**
-- `text_row`: Single cell row
-    - **value**
-- `kv_row`: A row with a label cell and a larger content cell 
-    - **key**: Label of the row
-    - **value**: Contents of the row
-- `lr_row`: 2 Equally spaced cells
-    - **left**: Content of the left column
-    - **right**: Content of the right column
-- `image_row`: 
-    - **cid**: content id reference to the configured custom list
+This app \(TRG\) provides actions to generate a tabular report that can be sent via email or stored as HTML to vault
 
 
-#### Example
-```
-{
-	"message": "hello",
-	"rows": [{
-    		"type": "image_row",
-            "cid": "image_1"
-          },
-        {
-			"type": "heading_row",
-			"value": "Ticket Overview"
-		},
-        {
-			"type": "kv_row",
-			"key": "Key",
-            "value": "Value"
-		},
-        {
-            "type": "kv_row",
-            "key": "another",
-            "value": "one"
-        }
-	]
-}
-```
+Replace this text in the app's **readme.html** to contain more detailed information
+
+
+### Configuration Variables
+The below configuration variables are required for this Connector to operate.  These variables are specified when configuring a SOAR asset in SOAR.
+
+VARIABLE | REQUIRED | TYPE | DESCRIPTION
+-------- | -------- | ---- | -----------
+**image\_list** |  optional  | string | Name of custom list storing images
+
+### Supported Actions  
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity using supplied configuration  
+[generate report email](#action-generate-report-email) - Generate raw email output containing the report  
+
+## action: 'test connectivity'
+Validate the asset configuration for connectivity using supplied configuration
+
+Type: **test**  
+Read only: **True**
+
+#### Action Parameters
+No parameters are required for this action
+
+#### Action Output
+No Output  
+
+## action: 'generate report email'
+Generate raw email output containing the report
+
+Type: **generic**  
+Read only: **True**
+
+#### Action Parameters
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**report\_json** |  required  | Report specification in JSON format | string |  `trg report json` 
+**from** |  required  | Report specification in JSON format | string | 
+**to** |  required  | Report specification in JSON format | string | 
+**subject** |  required  | Subject of the email to be sent | string | 
+
+#### Action Output
+DATA PATH | TYPE | CONTAINS
+--------- | ---- | --------
+action\_result\.parameter\.report\_json | string |  `trg report json` 
+action\_result\.status | string | 
+action\_result\.parameter\.from | string | 
+action\_result\.parameter\.to | string | 
+action\_result\.parameter\.subject | string | 
+action\_result\.message | string | 
+action\_result\.data\.0\.rawemail | string | 
+action\_result\.summary | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric | 

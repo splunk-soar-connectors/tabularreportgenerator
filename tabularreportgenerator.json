@@ -16,7 +16,7 @@
         }
     ],
     "license": "Copyright (c) Splunk Community, 2022",
-    "app_version": "1.0.0",
+    "app_version": "1.0.1",
     "utctime_updated": "2022-01-11T12:32:43.321597Z",
     "package_name": "phantom_tabularreportgenerator",
     "main_module": "tabularreportgenerator_connector.py",
