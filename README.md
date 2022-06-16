@@ -2,7 +2,7 @@
 # Tabular Report Generator
 
 Publisher: Splunk Community  
-Connector Version: 1\.0\.1  
+Connector Version: 1\.0\.2  
 Product Vendor: Splunk Community  
 Product Name: SOAR  
 Product Version Supported (regex): "\.\*"  
