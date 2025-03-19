@@ -15,7 +15,7 @@
             "name": "Daniel Federschmidt"
         }
     ],
-    "license": "Copyright (c) Splunk Community, 2022",
+    "license": "Copyright (c) Splunk Community, 2022-2025",
     "app_version": "1.0.2",
     "utctime_updated": "2022-06-15T16:11:02.000000Z",
     "package_name": "phantom_tabularreportgenerator",
