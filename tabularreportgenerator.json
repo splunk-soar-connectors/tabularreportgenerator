@@ -32,16 +32,12 @@
     "pip3_dependencies": {
         "wheel": [
             {
-                "module": "dataclasses",
-                "input_file": "wheels/py3/dataclasses-0.8-py3-none-any.whl"
-            },
-            {
                 "module": "pydantic",
-                "input_file": "wheels/py36/pydantic-1.9.0-cp36-cp36m-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
+                "input_file": "wheels/py39/pydantic-1.9.0-cp39-cp39-manylinux2014_x86_64.manylinux_2_17_x86_64.manylinux_2_28_x86_64.whl"
             },
             {
                 "module": "typing_extensions",
-                "input_file": "wheels/py3/typing_extensions-4.1.1-py3-none-any.whl"
+                "input_file": "wheels/py3/typing_extensions-4.13.0-py3-none-any.whl"
             }
         ]
     },

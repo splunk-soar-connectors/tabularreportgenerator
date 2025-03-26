@@ -1,0 +1,15 @@
+Splunk SOAR Tabular Report Generator
+Copyright (c) Splunk Community, 2022-2025
+
+Third Party Software Attributions:
+
+Name: pydantic
+Version: 1.9.0
+Author: Samuel Colvin
+License: MIT
+
+Name: typing_extensions
+Version: 4.13.0
+Author: 
+License: 
+
