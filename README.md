@@ -1,7 +1,7 @@
 # Tabular Report Generator
 
 Publisher: Splunk Community \
-Connector Version: 1.0.2 \
+Connector Version: 1.0.3 \
 Product Vendor: Splunk Community \
 Product Name: SOAR \
 Minimum Product Version: 5.2.0
